@@ -153,6 +153,7 @@ def plot_DET(_good: List[float], _bad: List[float]):
     plt.title('DET')
     plt.plot(x, y)
 
+
 def plot_ROC(_good: List[float], _bad: List[float]):
     low, high = get_low_high(_good, _bad)
     r = np.linspace(low, high)
@@ -160,7 +161,7 @@ def plot_ROC(_good: List[float], _bad: List[float]):
     y = []
     for i in range(len(r)):
         x.append(false_match_rate(_bad, r[i]))  # FMR
-        y.append(true_match_rate(_good, r[i]))  # FNMR
+        y.append(true_match_rate(_good, r[i]))  # TMR
     plt.figure(5)
     plt.xlabel('FMR(t)')
     plt.ylabel('TMR(t)')
@@ -168,10 +169,10 @@ def plot_ROC(_good: List[float], _bad: List[float]):
     plt.plot(x, y)
 
 
-
 if __name__ == '__main__':
     import os
-    os.makedirs("images",exist_ok=True)
+
+    os.makedirs("images", exist_ok=True)
     matrix: List[List[float]] = load_matrix("scorematrix.txt")
     id: List[int] = load_id("id.txt")
     good, bad = split_good_bad(matrix, id)
