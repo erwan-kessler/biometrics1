@@ -102,8 +102,10 @@ def plot_hists(good: List[float], bad: List[float], size: int):
     bin_size = round(math.sqrt(size * size / 2))
     print("Using binsize", bin_size)
     plt.figure(1)
-    plt.hist(good, bins=bin_size, stacked=True, histtype='bar', alpha=0.5, label='Genuine distribution', density=True)  # arguments are passed to np.histogram
-    plt.hist(bad, bins=bin_size, stacked=True, histtype='bar', alpha=0.5, label='Imposter Distribution', density=True)  # arguments are passed to np.histogram
+    plt.hist(good, bins=bin_size, stacked=True, histtype='bar', alpha=0.5, label='Genuine distribution',
+             density=True)  # arguments are passed to np.histogram
+    plt.hist(bad, bins=bin_size, stacked=True, histtype='bar', alpha=0.5, label='Imposter Distribution',
+             density=True)  # arguments are passed to np.histogram
     plt.title("GENUINE AND IMPOSTER SCORE DISTRIBUTION")
     plt.xlabel('Match Score')
     plt.ylabel('Probability')
@@ -169,12 +171,24 @@ def plot_ROC(_good: List[float], _bad: List[float]):
     plt.plot(x, y)
 
 
+def trace_matrix(id):
+    arr = np.zeros((len(id), len(id)))
+    for i,y in enumerate(id):
+        for j,x in enumerate(id):
+            if x == y:
+                arr[i][j] = 1
+    plt.figure(0)
+    plt.imshow(arr)
+
+
 if __name__ == '__main__':
     import os
 
     os.makedirs("images", exist_ok=True)
     matrix: List[List[float]] = load_matrix("scorematrix.txt")
     id: List[int] = load_id("id.txt")
+    trace_matrix(id)
+    plt.savefig('images/matrix_id.eps', format='eps')
     good, bad = split_good_bad(matrix, id)
     plot_hists(good, bad, len(matrix))
     plt.savefig('images/hists.png')
