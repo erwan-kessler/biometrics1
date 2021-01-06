@@ -171,25 +171,46 @@ def plot_ROC(_good: List[float], _bad: List[float]):
     plt.plot(x, y)
 
 
+def compute_eer(_good: List[float], _bad: List[float]):
+    fpr = []
+    tpr = []
+    low, high = get_low_high(_good, _bad)
+    thresholds = np.linspace(low, high)
+    for i in range(len(thresholds)):
+        fpr.append(false_match_rate(_bad, thresholds[i]))  # FMR
+        tpr.append(true_match_rate(_good, thresholds[i]))  # TMR
+    err = 0, (0, 0)
+    mini = 2
+    for item_fpr, item_tpr, threshold in zip(fpr, tpr, thresholds):
+        item_fnr = 1 - item_tpr
+        s = abs(item_fnr - item_fpr)  # FNR -FPR
+        if s < mini:
+            mini = s
+            err = (item_fpr + item_fnr) / 2, (item_fpr, item_tpr, threshold)
+    return err
+
+
 def trace_matrix(id):
-    arr = np.zeros((len(id), len(id)))
-    for i,y in enumerate(id):
-        for j,x in enumerate(id):
+    arr = np.zeros((200, 200))
+    for i, y in enumerate(id[:200]):
+        for j, x in enumerate(id[:200]):
             if x == y:
                 arr[i][j] = 1
     plt.figure(0)
-    plt.imshow(arr)
+    plt.imshow(arr, interpolation='none')
 
 
 if __name__ == '__main__':
     import os
 
     os.makedirs("images", exist_ok=True)
-    matrix: List[List[float]] = load_matrix("scorematrix.txt")
-    id: List[int] = load_id("id.txt")
+    matrix: List[List[float]] = load_matrix("ressources/scorematrix.txt")
+    id: List[int] = load_id("ressources/id.txt")
     trace_matrix(id)
-    plt.savefig('images/matrix_id.eps', format='eps')
+    plt.savefig('images/matrix_id.eps', format='eps', dpi=1000)
+    plt.savefig('images/matrix_id.png', format='png', dpi=1000)
     good, bad = split_good_bad(matrix, id)
+    print(compute_eer(good, bad))
     plot_hists(good, bad, len(matrix))
     plt.savefig('images/hists.png')
     plot_FMR(good, bad)
